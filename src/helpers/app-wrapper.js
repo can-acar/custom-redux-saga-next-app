@@ -1,30 +1,50 @@
-export const initApp = (initialReducers) => {
+import App from "next/app";
+
+export const createStore = (initialState) => {
+
     const state = {};
 
-    for (const key in initialReducers) {
-        state[key] = initialReducers[key](undefined, {type: '@@INIT'});
+    for (const key in initialState) {
+        if (typeof initialState[key] === "function") {
+            state[key] = initialState[key](state, {type: "@@INIT"});
+        } else {
+            console.warn(`initialState[${key}] is not a function.`);
+        }
     }
 
-    return state;
-};
-const wrapper = {
-    initApp: (Component) => {
-        const initialState = initApp(initialReducers);
+    const dispatch = (action) => {
+        for (const key in initialState) {
+            state[key] = initialState[key](state[key], action);
+        }
+    }
+
+    const getState = () => {
+        return state;
+    }
+
+    const initApp = (Component) => {
+
 
         Component.getInitialProps = async (appContext) => {
-            // Diğer getInitialProps işlemleri...
-            const pageProps = {};
 
-            // Global state'i `pageProps.state` içine yerleştirin
+            let pageProps = {};
+
+            const store = createStore(initialState);
+            debugger
+            Object.assign(appContext, {store});
+
+            if (Component.getInitialProps) {
+                pageProps = await App.getInitialProps(appContext);
+            }
+
             pageProps.state = initialState;
 
-            return {pageProps};
+            return pageProps
         };
 
         return Component;
-    },
-
-    useInitialProps: (handler) => {
+    }
+    const useInitialProps = (handler) => {
         return async (context) => {
             try {
                 const pageProps = await handler(context);
@@ -34,9 +54,8 @@ const wrapper = {
                 throw error;
             }
         }
-    },
-
-    useServerSideProps: (handler) => {
+    }
+    const useServerSideProps = (handler) => {
         return async (context) => {
             try {
                 const pageProps = await handler(context);
@@ -46,9 +65,8 @@ const wrapper = {
                 throw error;
             }
         }
-    },
-
-    useServerStaticProps: (handler) => {
+    }
+    const useServerStaticProps = (handler) => {
         return async (context) => {
             try {
                 const pageProps = await handler(context);
@@ -58,8 +76,8 @@ const wrapper = {
                 throw error;
             }
         }
-    },
-    useServerPaths: (handler) => {
+    }
+    const useServerPaths = (handler) => {
         return async (context) => {
             try {
                 const pageProps = await handler(context);
@@ -71,6 +89,9 @@ const wrapper = {
         }
     }
 
-};
 
-export default wrapper;
+    return {
+        dispatch, getState, initApp, useInitialProps, useServerSideProps, useServerStaticProps, useServerPaths
+    }
+}
+

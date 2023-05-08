@@ -1,16 +1,18 @@
-import wrapper from "@/helpers/wrapper";
-import rootSaga from "@/sagas/root-saga";
-import {initialize} from "next/client";
+import {createStore} from "@/helpers/app-wrapper";
+import produce from "immer";
 
-let initialSate = {}
+let initialSate = {
+    user: ((draft, action) => {
+        switch (action.type) {
+            case "SET_USER":
+                draft = action.payload;
+                break;
+            default:
+                break;
+        }
+        return draft;
+    })
+}
 
-const appStore = ((context) => {
-    debugger
-
-
-    return context;
-});
-
-const store = wrapper.makeStore(appStore, rootSaga, initialSate);
-
-export default store;
+const wrapper = createStore(initialSate);
+export default wrapper;

@@ -1,6 +1,6 @@
 import '@assets/globals.css';
-import wrapper from "@/helpers/app-wrapper";
 import {AppProvider} from "@/contexts/app-provider";
+import wrapper from "@/store/store";
 
 
 const InitMain = ({Component, ...rest}) => {
@@ -8,8 +8,8 @@ const InitMain = ({Component, ...rest}) => {
 
     debugger
     return (
-        <AppProvider initialState={pageProps.state}>
-            <Component {...pageProps} />
+        <AppProvider initialState={rest}>
+            <Component {...rest.pageProps} />
         </AppProvider>
     );
 }

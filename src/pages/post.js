@@ -1,4 +1,4 @@
-import {useEffect, useReducer} from 'react';
+import {useEffect, useReducer, useState} from 'react';
 import useAppReducer from "@/hooks/use-app-reducer";
 import useSaga from "@/hooks/use-saga";
 import useReduce from "@/hooks/use-reduce";
@@ -6,6 +6,8 @@ import {fetchPostSaga, updatePostTitleSaga} from "@/sagas/post";
 import postReducer from "@/reducers/post";
 import {createSagaMiddleware, runGenerator} from "@/helpers/create-saga-middleware";
 import wrapper from "@/helpers/wrapper";
+import {useStore} from "@/contexts/app-provider";
+import mediator from "@/helpers/mediator";
 
 
 function* fetchData(action) {
@@ -21,37 +23,39 @@ function* fetchData(action) {
 const effects = {"FETCH_POST_REQUEST": fetchData};
 
 const PostPage = () => {
-    const [postState, postDispatch] = useAppReducer("post", postReducer);
-    const post = useReduce((state) => state?.post);
-    const saga = useSaga({FETCH_POST_REQUEST: fetchPostSaga, UPDATE_POST_TITLE_REQUEST: updatePostTitleSaga});
+    const [state, dispatchPost] = useStore('post', postReducer);
+    const [inputValue, setInputValue] = useState('');
+    const handleChange = (event) => {
+        setInputValue(event.target.value);
+    };
 
-    useEffect(() => {
-        debugger
-        saga({type: "FETCH_POST_REQUEST"});
-        //postDispatch({type: "FETCH_POST_REQUEST"});
-    }, []);
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
-    const handleUpdateTitle = async () => {
-        const newTitle = prompt("Enter new title");
-        if (newTitle) {
-            await saga({type: "UPDATE_POST_TITLE_REQUEST", payload: {title: newTitle}});
+        const generator = mediator.publish('action', {
+            type: 'ADD_POST',
+            payload: {title: inputValue},
+        });
+
+        for await (const action of generator) {
+            dispatchPost(action);
         }
+
+        setInputValue('');
     };
 
     return (
         <div>
-            {postState.loading ? (
-                <p>Loading...</p>
-            ) : postState.error ? (
-                <p>Error: {postState.error.message}</p>
-            ) : (
-                <div>
-                  <pre>
-                    {JSON.stringify(post, null, 2)}
-                  </pre>
-                    <button onClick={handleUpdateTitle}>Update Title</button>
-                </div>
-            )}
+            <h1>Post Page</h1>
+            <form onSubmit={handleSubmit}>
+                <input type="text" value={inputValue} onChange={handleChange}/>
+                <button type="submit">Add Post</button>
+            </form>
+            <ul>
+                {state.post.data.map((post, index) => (
+                    <li key={index}>{post.title}</li>
+                ))}
+            </ul>
         </div>
     );
 };
