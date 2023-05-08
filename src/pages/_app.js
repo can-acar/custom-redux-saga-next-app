@@ -1,28 +1,26 @@
 import '@assets/globals.css';
-
-import rootSaga from "@/sagas/root-saga";
-import App from "next/app";
-import store from "@/store/store";
+import wrapper from "@/helpers/app-wrapper";
+import {AppProvider} from "@/contexts/app-provider";
 
 
 const InitMain = ({Component, ...rest}) => {
 
-    const {AppProvider, pageProps} = store.useAppStore(rest);
+
     debugger
     return (
-        <AppProvider rootSaga={rootSaga}>
+        <AppProvider initialState={pageProps.state}>
             <Component {...pageProps} />
         </AppProvider>
     );
 }
 
-InitMain.getInitialProps = store.useServerInitialProps(store => async (appContext) => {
-    debugger
+// InitMain.getInitialProps = store.useServerInitialProps(store => async (appContext) => {
+//     debugger
+//
+//     const appProps = await App.getInitialProps(appContext);
+//
+//     return {...appProps};
+// });
 
-    const appProps = await App.getInitialProps(appContext);
 
-    return {...appProps};
-});
-
-
-export default InitMain;
+export default wrapper.initApp(InitMain);
