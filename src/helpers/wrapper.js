@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useReducer} from "react";
+import {useReducer} from "react";
 import StateContext from "@/contexts/state-context";
 
 const makeStore = (context) => {

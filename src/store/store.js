@@ -1,18 +1,10 @@
-import {createStore} from "@/helpers/app-wrapper";
-import produce from "immer";
+import {createStore, createWrapper} from "@/helpers/app-wrapper";
 
 let initialSate = {
-    user: ((draft, action) => {
-        switch (action.type) {
-            case "SET_USER":
-                draft = action.payload;
-                break;
-            default:
-                break;
-        }
-        return draft;
-    })
+    deneme: () => "deneme"
 }
 
-const wrapper = createStore(initialSate);
+const store = createStore(initialSate);
+
+const wrapper = createWrapper(store);
 export default wrapper;

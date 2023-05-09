@@ -1,7 +1,6 @@
 import App from "next/app";
 
 export const createStore = (initialState) => {
-
     const state = {};
 
     for (const key in initialState) {
@@ -17,81 +16,96 @@ export const createStore = (initialState) => {
             state[key] = initialState[key](state[key], action);
         }
     }
-
     const getState = () => {
         return state;
     }
 
+    return {
+        getState,
+        dispatch
+    }
+}
+
+export const createWrapper = async (store) => {
+
+
     const initApp = (Component) => {
-
-
         Component.getInitialProps = async (appContext) => {
 
+
             let pageProps = {};
+            const state = store.getState();
 
-            const store = createStore(initialState);
-            debugger
             Object.assign(appContext, {store});
-
+            debugger
             if (Component.getInitialProps) {
                 pageProps = await App.getInitialProps(appContext);
             }
 
-            pageProps.state = initialState;
+            Object.assign(pageProps.state, {store});
 
             return pageProps
         };
 
         return Component;
     }
+
     const useInitialProps = (handler) => {
         return async (context) => {
             try {
                 const pageProps = await handler(context);
                 return {pageProps};
             } catch (error) {
-                console.error('Error in getInitialProps:', error);
+                console.error("Error in useInitialProps:", error);
                 throw error;
             }
-        }
-    }
+        };
+    };
+
     const useServerSideProps = (handler) => {
         return async (context) => {
             try {
                 const pageProps = await handler(context);
-                return {pageProps};
+                return {props: {...pageProps}};
             } catch (error) {
-                console.error('Error in useServerSideProps:', error);
+                console.error("Error in useServerSideProps:", error);
                 throw error;
             }
-        }
-    }
+        };
+    };
+
     const useServerStaticProps = (handler) => {
         return async (context) => {
             try {
                 const pageProps = await handler(context);
-                return {pageProps};
+                return {props: {...pageProps}};
             } catch (error) {
-                console.error('Error in useServerStaticProps:', error);
+                console.error("Error in useServerStaticProps:", error);
                 throw error;
             }
-        }
-    }
+        };
+    };
+
     const useServerPaths = (handler) => {
         return async (context) => {
             try {
-                const pageProps = await handler(context);
-                return {pageProps};
+                const paths = await handler(context);
+                return {paths, fallback: false};
             } catch (error) {
-                console.error('Error in useServerPaths:', error);
+                console.error("Error in useServerPaths:", error);
                 throw error;
             }
-        }
-    }
-
+        };
+    };
 
     return {
-        dispatch, getState, initApp, useInitialProps, useServerSideProps, useServerStaticProps, useServerPaths
+        initApp,
+        useInitialProps,
+        useServerSideProps,
+        useServerPaths,
+        useServerStaticProps,
     }
 }
+
+
 

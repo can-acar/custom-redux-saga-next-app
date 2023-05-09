@@ -1,10 +1,5 @@
-import {useEffect, useReducer, useState} from 'react';
-import useAppReducer from "@/hooks/use-app-reducer";
-import useSaga from "@/hooks/use-saga";
-import useReduce from "@/hooks/use-reduce";
-import {fetchPostSaga, updatePostTitleSaga} from "@/sagas/post";
+import {useState} from 'react';
 import postReducer from "@/reducers/post";
-import {createSagaMiddleware, runGenerator} from "@/helpers/create-saga-middleware";
 import wrapper from "@/helpers/wrapper";
 import {useStore} from "@/contexts/app-provider";
 import mediator from "@/helpers/mediator";

@@ -4,24 +4,7 @@ import useSaga from "@/hooks/use-saga";
 import useReduce from "@/hooks/use-reduce";
 
 
-export const initialState = {
-    data: null,
-    loading: false,
-    error: null,
-};
 
-const mediaReducer = (state, action) => {
-    switch (action.type) {
-        case 'FETCH_MEDIA_REQUEST':
-            return {...state, loading: true};
-        case 'FETCH_MEDIA_SUCCESS':
-            return {...state, loading: false, data: action.payload};
-        case 'FETCH_MEDIA_FAILURE':
-            return {...state, loading: false, error: action.error};
-        default:
-            return state;
-    }
-};
 
 function* fetchMedia(action, dispatch) {
     try {
@@ -76,24 +59,9 @@ const MediaListPage = (props) => {
     );
 };
 export const getServerSideProps = async (ctx) => {
-    let state = null;
-    debugger
-    const initialState = {};
-    const reducer = (state, action) => state;
-    const [storeState, baseDispatch] = useReducer(reducer, initialState);
 
-    try {
-        ctx.store.dispatch({type: "FETCH_MEDIA_REQUEST", payload: {page: 1, limit: 10}});
-        let result = await ctx.store.sagaMiddleware.run({FETCH_MEDIA_REQUEST: fetchMedia});
 
-        state = {
-            ...result,
-        };
-    } catch (error) {
-        state = {};
-    }
-
-    return {props: {state}};
+    return {props: {}};
 };
 
 // export const getServerSideProps = async (ctx) => {
