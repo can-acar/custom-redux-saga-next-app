@@ -2,7 +2,7 @@ import {useReducer} from "react";
 import StateContext from "@/contexts/state-context";
 
 const makeStore = (context) => {
-    debugger
+
 
     context.__storeState__ = context?.__storeState__ || {};
 

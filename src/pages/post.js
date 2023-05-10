@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import postReducer from "@/reducers/post";
-import wrapper from "@/helpers/wrapper";
 import {useStore} from "@/contexts/app-provider";
 import mediator from "@/helpers/mediator";
+import wrapper from "@/store/store";
 
 
 function* fetchData(action) {
@@ -18,6 +18,7 @@ function* fetchData(action) {
 const effects = {"FETCH_POST_REQUEST": fetchData};
 
 const PostPage = () => {
+
     const [state, dispatchPost] = useStore('post', postReducer);
     const [inputValue, setInputValue] = useState('');
     const handleChange = (event) => {
@@ -55,7 +56,6 @@ const PostPage = () => {
     );
 };
 export const getServerSideProps = wrapper.useServerSideProps((store) => async (context) => {
-    debugger
 
 
     return {props: {}};

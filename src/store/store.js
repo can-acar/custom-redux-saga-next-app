@@ -1,8 +1,9 @@
 import {createStore, createWrapper} from "@/helpers/app-wrapper";
+import appReducer from "@/reducers/default";
 
-let initialSate = {
-    deneme: () => "deneme"
-}
+let initialSate = ({
+    "app": appReducer
+})
 
 const store = createStore(initialSate);
 

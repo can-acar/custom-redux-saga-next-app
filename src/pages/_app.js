@@ -1,26 +1,27 @@
 import '@assets/globals.css';
-import {AppProvider} from "@/contexts/app-provider";
 import wrapper from "@/store/store";
 
 
 const InitMain = ({Component, ...rest}) => {
+    //const {state, pageProps} = wrapper.usePageStore(rest);
 
-
-    debugger
     return (
-        <AppProvider initialState={rest}>
-            <Component {...rest.pageProps} />
-        </AppProvider>
+
+        <Component {...rest.pageProps} />
+
     );
 }
 
-// InitMain.getInitialProps = store.useServerInitialProps(store => async (appContext) => {
-//     debugger
+// InitMain.getInitialProps = wrapper.useInitialProps(store => async (appContext) => {
 //
-//     const appProps = await App.getInitialProps(appContext);
+//     let pageProps = {};
 //
-//     return {...appProps};
-// });
+//     if (appContext.Component.getInitialProps) {
+//
+//         pageProps = await appContext.Component.getInitialProps(appContext.ctx);
+//     }
+//
+//     return {pageProps};
+// })
 
-
-export default wrapper.initApp(InitMain);
+export default wrapper.useInitApp(InitMain);

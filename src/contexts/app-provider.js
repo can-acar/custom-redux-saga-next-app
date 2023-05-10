@@ -46,7 +46,7 @@ export const AppProvider = ({children, initialState, debug = true}) => {
         useEffect(() => {
 
             const unsubscribe = mediator.subscribe('action', (action) => dispatch(action));
-            debugger
+            
             mediator.run('action');
 
             return () => {
@@ -72,7 +72,7 @@ export const useAppDispatch = () => useContext(AppDispatchContext);
 export const useStore = (reducerName, reducer) => {
     const state = useAppState();
     const dispatch = useAppDispatch();
-    debugger
+    
     if (!Object.hasOwnProperty.call(state, reducerName) && reducer) {
         dispatch({type: '@@INIT', payload: {reducerName, reducer}});
 
