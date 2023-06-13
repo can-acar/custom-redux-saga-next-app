@@ -60,6 +60,7 @@ export const createStore = (initialState, middleware) => {
 
 export const createWrapper = (initStore) => {
     
+    
     const createProps = async (storeCallback, appContext, initialProp) => {
         
         const store = storeCallback(appContext);
@@ -84,48 +85,65 @@ export const createWrapper = (initStore) => {
         }
         
     }
-    const useInitApp = (Component = App) => {
-        
-        
+    const withMain = (Component = React.Component) => {
         const WrappedComponent = (props) => {
-            debugger
-            const {state, pageProps} = usePageStore(props);
+            
+            const {state, props: combinedProps} = usePageStore(props);
             
             return (<AppProvider initialState={state}>
-                <Component {...pageProps} />
+                <Component {...(combinedProps)} />
             </AppProvider>);
         };
         
-        WrappedComponent.displayName = `useInitApp(${Component.displayName || Component.name || Component})`;
+        WrappedComponent.displayName = `withMain(${Component.displayName || Component.name || Component})`;
         
         if ('getInitialProps' in Component) {
             WrappedComponent.getInitialProps = Component.getInitialProps;
         }
         
-        return WrappedComponent;
+        return WrappedComponent;  // <--- Here is the correction
     };
-    const usePageStore = (props) => {
     
+    const usePageStore = (p) => {
+        const {initialState, initialProps, ...props} = p;
+        
+        
+        let resultProps = props;
+        
+        resultProps.pageProps = initialProps;
+        
+        resultProps.initialState = initialState;
+        
+        
         const state = useMemo(() => {
             
-            if (props.pageProps && props.pageProps.state) {
-                return props.pageProps.state;
+            if (resultProps.pageProps && result.pageProps.state) {
+                return resultProps.pageProps.state;
             }
+            
             return {};
-        }, [props.pageProps]);
+        }, [resultProps.pageProps]);
         
         const pageProps = useMemo(() => {
             
-            const {state, ...combinePageProps} = props.pageProps || {};
-            return combinePageProps || {};
-        }, [props.pageProps]);
+            const {...combinePageProps} = props || {};
+            
+            return combinePageProps;
+        }, [props]);
         
-        return {state, pageProps};
-    };
+        //
+        // delete resultProps?.pageProps.initialState;
+        // delete resultProps?.pageProps.initialProps
+        //
+        
+        return {state, props: {...initialProps, ...resultProps}};
+    }
+    
+    
     const useInitialProps = (handler) => {
         return async (context) => {
             try {
-                const nextCallback = handler(context.store);
+                const nextCallback = handler(context.state);
                 const initialProps = (nextCallback && (await nextCallback(context))) || {};
                 debugger
                 return await createProps(initStore, context, initialProps);
@@ -138,7 +156,7 @@ export const createWrapper = (initStore) => {
     const useServerSideProps = (handler) => {
         return async (context) => {
             try {
-                const nextCallback = handler(context.store);
+                const nextCallback = handler(context.state);
                 const initialProps = (nextCallback && (await nextCallback(context))) || {};
                 return {props: {...initialProps}};
             } catch (error) {
@@ -172,7 +190,7 @@ export const createWrapper = (initStore) => {
     
     
     return {
-        useInitApp,
+        withMain,
         useInitialProps,
         useServerSideProps,
         useServerPaths,

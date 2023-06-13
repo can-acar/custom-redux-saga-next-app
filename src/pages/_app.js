@@ -1,16 +1,13 @@
 import '@assets/globals.css';
+import {AppProvider} from "@/contexts/app-provider";
 import wrapper from "@/store/store";
+import {useMemo, useState} from "react";
 
 
-const InitMain = ({Component, ...rest}) => {
-    //const {state, pageProps} = wrapper.usePageStore(rest);
+const MyApp = ({Component, pageProps}) => <Component {...pageProps} />
 
-    return (
 
-        <Component {...rest.pageProps} />
-
-    );
-}
+export default wrapper.withMain(MyApp);
 
 // InitMain.getInitialProps = wrapper.useInitialProps(store => async (appContext) => {
 //
@@ -23,5 +20,3 @@ const InitMain = ({Component, ...rest}) => {
 //
 //     return {pageProps};
 // })
-
-export default wrapper.useInitApp(InitMain);
