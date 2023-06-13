@@ -4,20 +4,20 @@ import App from "next/app";
 import {AppProvider} from "@/contexts/app-provider";
 
 export const createStore = (initialState, middleware) => {
-
+    
     let state = initialState;
     let listeners = [];
-
+    
     const getState = () => {
-
+        
         // initialState ={app: appReducer} return to {app: {data: {}, loading: false, error: null}}
         return Object.keys(state).reduce((acc, key) => {
             acc[key] = state[key](undefined, {type: '@@INIT'});
             return acc;
         }, {})
-
+        
     }
-
+    
     const dispatch = (action) => {
         state = produce(state, (draftState) => {
             for (const key in draftState) {
@@ -26,100 +26,100 @@ export const createStore = (initialState, middleware) => {
                 }
             }
         });
-
+        
         if (middleware) {
             middleware({getState, dispatch})(action);
         }
-
+        
         listeners.forEach(listener => listener());
     }
-
+    
     const subscribe = (listener) => {
         listeners.push(listener);
-
+        
         return () => {
             listeners = listeners.filter(l => l !== listener);
         }
     }
-
+    
     return (context) => {
-
-
+        
+        
         if (typeof window === 'undefined') {
             if (!context.ctx.req?.wrappedStore) {
                 context.ctx.req.wrappedStore = createStore(initialState, middleware);
             }
         }
-
+        
         return {
-
+            
             getState, dispatch, subscribe,
         };
     }
 }
 
 export const createWrapper = (initStore) => {
-
+    
     const createProps = async (storeCallback, appContext, initialProp) => {
-
+        
         const store = storeCallback(appContext);
-
+        
         const state = store.getState();
-
+        
         if (appContext.ctx) {
-
+            
             Object.assign(appContext.ctx, {store});
         } else {
             Object.assign(appContext, {store});
         }
-
+        
         if (!Object.hasOwnProperty.call(initialProp.pageProps, 'state')) {
-
+            
             Object.assign(initialProp.pageProps, {state});
         }
-
-
+        
+        
         return {
             state, ...initialProp
         }
-
+        
     }
     const useInitApp = (Component = App) => {
-        debugger
-
+        
+        
         const WrappedComponent = (props) => {
-
-            const {state, pageProps} = usePageStore(props, WrappedComponent.displayName);
-
+            debugger
+            const {state, pageProps} = usePageStore(props);
+            
             return (<AppProvider initialState={state}>
-                    <Component {...pageProps} />
-                </AppProvider>);
+                <Component {...pageProps} />
+            </AppProvider>);
         };
-
-        WrappedComponent.displayName = `useInitApp(${Component.displayName || Component.name || 'Component'})`;
-
+        
+        WrappedComponent.displayName = `useInitApp(${Component.displayName || Component.name || Component})`;
+        
         if ('getInitialProps' in Component) {
             WrappedComponent.getInitialProps = Component.getInitialProps;
         }
-
+        
         return WrappedComponent;
     };
     const usePageStore = (props) => {
-
+    
         const state = useMemo(() => {
-
+            
             if (props.pageProps && props.pageProps.state) {
                 return props.pageProps.state;
             }
             return {};
         }, [props.pageProps]);
-
+        
         const pageProps = useMemo(() => {
-
+            
             const {state, ...combinePageProps} = props.pageProps || {};
-            return combinePageProps;
+            return combinePageProps || {};
         }, [props.pageProps]);
-
+        
         return {state, pageProps};
     };
     const useInitialProps = (handler) => {
@@ -169,8 +169,8 @@ export const createWrapper = (initStore) => {
             }
         };
     };
-
-
+    
+    
     return {
         useInitApp,
         useInitialProps,
