@@ -6,6 +6,13 @@ import {useMemo, useState} from "react";
 
 const MyApp = ({Component, pageProps}) => <Component {...pageProps} />
 
+// MyApp.getInitialProps = async ({Component, ctx}) => {
+//     debugger
+//     const pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {};
+//
+//     return {pageProps};
+// }
+
 
 export default wrapper.withMain(MyApp);
 

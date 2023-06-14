@@ -3,7 +3,7 @@ export const initialState = {
 };
 
 const actions = {
-
+    
     ['SET_APP_DATA']: (state, action) => {
         return {
             ...state, data: action.payload, loading: true,
@@ -13,16 +13,16 @@ const actions = {
             ...state, loading: false, data: action.payload,
         }
     }
-
+    
 }
 
 const appReducer = (state = initialState, action) => {
-    debugger
+    
     if (actions[action.type]) {
-
+        
         return Object.assign({}, actions[action.type](state, action));
     }
-
+    
     return state;
 };
 
